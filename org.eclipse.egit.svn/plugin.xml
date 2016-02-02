@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.egit.svn.internal.preferences.GitSvnPreferenceInitializer"/>
+   </extension>
+	<extension point="org.eclipse.ui.preferencePages">
+      <page name="%GitPreferences_GitInstallation"
+	    category="org.eclipse.egit.ui.GitPreferences"
+            class="org.eclipse.egit.svn.internal.preferences.GitLocalInstallationPreferencePage"
+	        id="org.eclipse.egit.svn.internal.preferences.GitInstallationPreferencePage" >
+	    <keywordReference
+		  id="org.eclipse.egit.ui.keyword.git">
+	    </keywordReference>
+      </page>
+    </extension>
+    
+ <extension
+       point="org.eclipse.ui.commands">
+    <command
+    	  categoryId="org.eclipse.egit.ui.commandCategory"
+          id="org.eclipse.egit.ui.team.svn.dcommit"
+          defaultHandler="org.eclipse.egit.svn.handlers.SvnInfo"
+          name="Svn dcommit">
+    </command>
+    <command
+          categoryId="org.eclipse.egit.ui.commandCategory"
+          id="org.eclipse.egit.ui.team.svn.rebase"
+          name="Svn rebase">
+    </command>
+    <command
+          categoryId="org.eclipse.egit.ui.commandCategory"
+          id="org.eclipse.egit.ui.team.svn.fetch"
+          name="Svn fetch">
+    </command>
+ </extension>
+  <extension
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="org.eclipse.egit.svn.handlers.SvnInfo"
+          commandId="org.eclipse.egit.ui.team.svn.dcommit">
+    </handler>
+    <handler
+          commandId="org.eclipse.egit.svn.handler2">
+    </handler>
+    <handler
+          commandId="org.eclipse.egit.ui.team.svn.fetch">
+    </handler>
+ </extension>
+ <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:team.main?after=group3">
+       <command
+             commandId="org.eclipse.egit.ui.team.svn.dcommit"
+             label="Dcommit"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <reference
+                   definitionId="org.eclipse.egit.svn.definition">
+             </reference>
+          </visibleWhen>
+       </command>
+    </menuContribution>
+ </extension>
+ <extension
+       point="org.eclipse.core.expressions.definitions">
+    <definition
+          id="org.eclipse.egit.svn.definition">
+       <test
+             property="GitSelection.resourcesAllInRepository">
+       </test>
+    </definition>
+ </extension>
+    
+</plugin>
