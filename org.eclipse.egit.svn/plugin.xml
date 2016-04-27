@@ -74,5 +74,14 @@
        </test>
     </definition>
  </extension>
+ <extension
+       point="org.eclipse.ui.importWizards">
+    <wizard
+          category="org.eclipse.egit.ui.internal.clone.gitclonecategory"
+          class="org.eclipse.egit.svn.wizard.SvnProjectWizard"
+          id="org.eclipse.egit.svn.wizard"
+          name="Svn repo import">
+    </wizard>
+ </extension>
     
 </plugin>
