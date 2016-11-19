@@ -24,6 +24,7 @@ public class SvnProjectWizard extends Wizard implements IImportWizard {
 	public void addPages() {
 		WizardPage svnLocationPage = new SvnLocationPage("Svn repo location");
 		addPage(svnLocationPage);
+		addPage(new SvnRepoPage("Select svn branches"));
 	}
 
 }
