@@ -17,6 +17,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +33,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class SvnRepoPage extends WizardPage {
+
+	private FilteredTree branchesTree;
+	private Label labelMain;
 
 	protected SvnRepoPage(String pageName) {
 		super(pageName);
@@ -53,10 +57,38 @@ public class SvnRepoPage extends WizardPage {
 		Label label = new Label(panel, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		label.setText("Choose svn branches");
-		new FilteredTree(panel, INFORMATION, new PatternFilter(), true);
+		branchesTree = new FilteredTree(panel, INFORMATION, new PatternFilter(), true);
+		branchesTree.getViewer().setContentProvider(new ITreeContentProvider() {
+			
+			@Override
+			public boolean hasChildren(Object element) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public Object getParent(Object element) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Object[] getElements(Object inputElement) {
+				return ((List<String>) inputElement).toArray();
+			}
+			
+			@Override
+			public Object[] getChildren(Object parentElement) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
+		
+		labelMain = new Label(panel, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		label.setText("Dohva�anje Repozitorija");
 		
 		setControl(panel);
-		runTask();
 	}
 	
 	
@@ -79,7 +111,7 @@ public class SvnRepoPage extends WizardPage {
 		return gd;
 	}
 	
-	private void getBranches(String url) throws IOException {
+	private List<String> getBranches(String url) throws IOException {
 		Document html = Jsoup.connect(url).timeout(30000).get(); 
 		Elements links = html.select("a");
 		
@@ -93,16 +125,23 @@ public class SvnRepoPage extends WizardPage {
 			}
 			
 		}
+		
+		return branches;
 	}
 	
 	private void runTask() {
+		
+		final List<String> branches = new ArrayList<>();
 		try {
 			getContainer().run(true, true, new IRunnableWithProgress() {
 
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
-						getBranches("https://svn.svnkit.com/repos/svnkit/branches/");
+						
+						monitor.beginTask("Geting svn branches", 1);
+						branches.addAll(getBranches("https://svn.svnkit.com/repos/svnkit/branches/"));
+						monitor.worked(1);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -114,6 +153,19 @@ public class SvnRepoPage extends WizardPage {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
+		branchesTree.getViewer().setInput(branches);
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		labelMain.getDisplay().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				runTask();
+			}
+		});
 	}
 	
 	private static void disableSSL() throws NoSuchAlgorithmException, KeyManagementException {
