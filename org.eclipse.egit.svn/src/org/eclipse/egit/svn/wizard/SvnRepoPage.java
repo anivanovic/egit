@@ -2,6 +2,7 @@ package org.eclipse.egit.svn.wizard;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -16,15 +17,21 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.egit.svn.Activator;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.jsoup.Jsoup;
@@ -57,8 +64,31 @@ public class SvnRepoPage extends WizardPage {
 		Label label = new Label(panel, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		label.setText("Choose svn branches");
-		branchesTree = new FilteredTree(panel, INFORMATION, new PatternFilter(), true);
-		branchesTree.getViewer().setContentProvider(new ITreeContentProvider() {
+		branchesTree = new FilteredTree(panel, INFORMATION, new PatternFilter(), true) {
+			 @Override
+			protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+				int treeStyle = style | SWT.CHECK | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER;
+				Tree tree = new Tree(parent, treeStyle);
+		
+				return new CheckboxTreeViewer(tree);
+			}
+		};
+		
+		TreeViewer breanchesViewer = branchesTree.getViewer();
+		breanchesViewer.setLabelProvider(new LabelProvider() {
+			private Image branchIcon = Activator.getImageDescriptor("icons/branch_obj.gif").createImage();
+			@Override
+			public Image getImage(Object element) {
+				return branchIcon;
+			}
+			
+			@Override
+			public void dispose() {
+				super.dispose();
+				branchIcon.dispose();
+			}
+		});
+		breanchesViewer.setContentProvider(new ITreeContentProvider() {
 			
 			@Override
 			public boolean hasChildren(Object element) {
@@ -86,7 +116,7 @@ public class SvnRepoPage extends WizardPage {
 		
 		labelMain = new Label(panel, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		label.setText("Dohva�anje Repozitorija");
+		label.setText("Get repository branches");
 		
 		setControl(panel);
 	}
@@ -121,7 +151,6 @@ public class SvnRepoPage extends WizardPage {
 			if (possibleBranche.endsWith("/")) {
 				String branchName = possibleBranche.replaceFirst("/", "");
 				branches.add(branchName);
-				System.out.println(branchName);
 			}
 			
 		}
