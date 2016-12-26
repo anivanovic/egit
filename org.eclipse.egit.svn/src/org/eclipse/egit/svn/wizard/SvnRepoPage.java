@@ -2,7 +2,6 @@ package org.eclipse.egit.svn.wizard;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -29,7 +28,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.FilteredTree;
@@ -115,30 +113,10 @@ public class SvnRepoPage extends WizardPage {
 		});
 		
 		labelMain = new Label(panel, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		label.setText("Get repository branches");
+		labelMain.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		labelMain.setText("Get repository branches");
 		
 		setControl(panel);
-	}
-	
-	
-	private static Group createGroup(final Composite parent, final String text, int columns) {
-		final Group g = new Group(parent, SWT.NONE);
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = columns;
-		g.setLayout(layout);
-		g.setText(text);
-		final GridData gd = createFilGD();
-		g.setLayoutData(gd);
-		return g;
-	}
-	
-
-	private static GridData createFilGD() {
-		final GridData gd = new GridData();
-		gd.grabExcessHorizontalSpace = true;
-		gd.horizontalAlignment = SWT.FILL;
-		return gd;
 	}
 	
 	private List<String> getBranches(String url) throws IOException {
@@ -168,12 +146,13 @@ public class SvnRepoPage extends WizardPage {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						
-						monitor.beginTask("Geting svn branches", 1);
+						monitor.beginTask("Geting svn branches", IProgressMonitor.UNKNOWN);
 						branches.addAll(getBranches("https://svn.svnkit.com/repos/svnkit/branches/"));
-						monitor.worked(1);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					} finally {
+						monitor.done();
 					}
 
 				}
@@ -188,6 +167,7 @@ public class SvnRepoPage extends WizardPage {
 	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
+		labelMain.getParent().layout();
 		labelMain.getDisplay().asyncExec(new Runnable() {
 			
 			@Override

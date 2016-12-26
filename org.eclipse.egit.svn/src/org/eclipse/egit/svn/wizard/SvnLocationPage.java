@@ -1,5 +1,6 @@
 package org.eclipse.egit.svn.wizard;
 
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,21 +34,36 @@ public class SvnLocationPage extends WizardPage {
 		
 		setControl(comp);
 	}
+	
+	private void createUrlFieldSet(Composite comp) {
+		Group g = createGroup(comp, "Svn location", 2);
+		Label svnUrl = new Label(g, SWT.NONE);
+		svnUrl.setText("Url:");
+		GridData gData = new GridData();
+		gData.horizontalAlignment = SWT.BEGINNING;
+		svnUrl.setData(gData);
+		
+		Text svnUrlField = new Text(g, SWT.BORDER);
+		svnUrlField.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+	}
 
 	private void createRevisionFieldSet(Composite comp) {
-		Group g = createGroup(comp, "Clone from revision", 4);
-		new Label(g, SWT.NONE).setText("Clone from revision");
+		Group g = createGroup(comp, "Set up costume revisons interval for cloning", 2);
 		final Button fromRevision = new Button(g, SWT.CHECK);
-		fromRevision.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+		fromRevision.setText("Use costume revision interval");
+		fromRevision.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
+		((GridData) fromRevision.getLayoutData()).horizontalSpan = 2;
 		
 		final Label fromL = new Label(g, SWT.NONE);
 		fromL.setText("Revision from: ");
-		final Text fromRev = new Text(g, SWT.NONE);
+		fromL.setEnabled(false);
+		final Text fromRev = new Text(g, SWT.BORDER);
 		fromRev.setEnabled(false);
 		
 		final Label toL = new Label(g, SWT.NONE);
-		toL.setText("to: ");
-		final Text toRev = new Text(g, SWT.NONE);
+		toL.setText("Revision to: ");
+		toL.setEnabled(false);
+		final Text toRev = new Text(g, SWT.BORDER);
 		toRev.setEnabled(false);
 		
 		fromRevision.addSelectionListener(new SelectionListener() {
@@ -70,29 +86,21 @@ public class SvnLocationPage extends WizardPage {
 		
 	}
 
-	private GridData createFilGD() {
-		final GridData gd = new GridData();
-		gd.grabExcessHorizontalSpace = true;
-		gd.horizontalAlignment = SWT.FILL;
-		return gd;
-	}
-
 	private void createRepoLayoutFieldSet(Composite comp) {
-		
-		Group g = createGroup(comp, "folders", 2);
+		Group g = createGroup(comp, "Folders", 2);
 		
 		new Label(g, SWT.NONE).setText("Trunk:");
-		Text trunk = new Text(g, SWT.NULL);
+		Text trunk = new Text(g, SWT.BORDER);
 		trunk.setText("trunk");
 		trunk.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 		
 		new Label(g, SWT.NONE).setText("Branches:");
-		Text branches = new Text(g, SWT.NULL);
+		Text branches = new Text(g, SWT.BORDER);
 		branches.setText("branches");
 		branches.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 		
 		new Label(g, SWT.NONE).setText("Tags:");
-		Text tags = new Text(g, SWT.NULL);
+		Text tags = new Text(g, SWT.BORDER);
 		tags.setText("tags");
 		tags.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 	}
@@ -109,18 +117,6 @@ public class SvnLocationPage extends WizardPage {
 		Text password = new Text(g, SWT.BORDER | SWT.PASSWORD);
 		password.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 	}
-
-	private void createUrlFieldSet(Composite comp) {
-		Group g = createGroup(comp, "Svn location", 2);
-		Label svnUrl = new Label(g, SWT.NONE);
-		svnUrl.setText("Url:");
-		GridData gData = new GridData();
-		gData.horizontalAlignment = SWT.BEGINNING;
-		svnUrl.setData(gData);
-		
-		Text svnUrlField = new Text(g, SWT.BORDER);
-		svnUrlField.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
-	}
 	
 	private Group createGroup(final Composite parent, final String text, int columns) {
 		final Group g = new Group(parent, SWT.NONE);
@@ -131,6 +127,13 @@ public class SvnLocationPage extends WizardPage {
 		final GridData gd = createFilGD();
 		g.setLayoutData(gd);
 		return g;
+	}
+	
+	private GridData createFilGD() {
+		final GridData gd = new GridData();
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalAlignment = SWT.FILL;
+		return gd;
 	}
 
 }
